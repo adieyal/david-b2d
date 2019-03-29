@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <style>
+            h1 {
+                font-size: 40px;
+                text-align: center;
+                font-family: sans-serif;
+            }
+            .switch {
+                width: 40px;
+                height: 40px;
+                background-color: red;
+                margin: 5px;
+            }
+
+            .switch.on {
+                background-color: green;
+            }
+
+            .piston {
+                margin-bottom: 15px;
+                height: 25px;
+            }
+            .piston .block {
+                width: 40px;
+                height: 20px;
+                background-color: blue;
+                float: left;
+            }
+
+            .piston .shaft {
+                width: 0px;
+                height: 10px;
+                background-color: brown;
+                float: left;
+                margin-top: 5px;
+            }
+
+            #binary {
+                margin-right: 100px;
+            }
+
+            #container {
+                display: flex;
+            }
+        </style>
+
+    </head>
+    <body>
+        <h1>Switches and piston example for David</h1>
+        <div id="container">
+            <div id="binary">
+            </div>
+            <div id="decimal">
+            </div>
+        </div>
+        <script>
+            var power_pistons = function() {
+                var total = 0;
+                d3.selectAll(".switch").each(function(el, idx) {
+                    var s = d3.select(this);
+                    var on = s.classed("on") ? 1 : 0;
+                    total += on * 2 ** idx;
+                })
+
+                d3.selectAll(".piston .shaft").transition().style("width", 0);
+                if (total > 0) {
+                    d3.select("#p" + (total - 1)).select(".shaft").transition().style("width", 80);
+                }
+            }
+            var container = d3.select("#container")
+            container.select("#binary").selectAll("div")
+                .data([1,1,1])
+                .enter()
+                .append("div")
+                    .attr("id", function(el, idx) {
+                        return "b" + idx;
+                    })
+                    .classed("switch", true)
+                    .on("click", function() {
+                        var s = d3.select(this);
+                        var is_on = s.classed("on")
+                        s.classed("on", !is_on)
+                        power_pistons();
+                    })
+
+            container.select("#decimal").selectAll("div")
+                .data([1,2,3,4,5,6,7])
+                .enter()
+                .append("div")
+                    .attr("id", function(el, idx) {
+                        return "p" + idx;
+                    })
+                    .classed("piston", true)
+                    .selectAll("div")
+                        .data([1,2,3])
+                        .enter() 
+                        .append("div")
+                            .classed("block", function(el, idx) {
+                                if (idx == 1)
+                                    return false;
+                                return true;
+                            })
+                            .classed("shaft", function(el, idx) {
+                                if (idx == 1)
+                                    return true;
+                                return false;
+                            })
+        </script>
+    </body>
+</html>
